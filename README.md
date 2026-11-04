@@ -1,11 +1,15 @@
 # RolangMalang League HUD
 
-A real-time OBS broadcasting overlay system for our community's League of Legends amateur tournament, "RolangMalang League."
+A professional real-time broadcasting HUD system designed for our community's amateur League of Legends tournament, **"RolangMalang League."**
 
-## Features
-- **Tournament API Integration**: Automatically receives live match data (kills, gold, objectives) via webhooks.
-- **OBS Browser Source**: Renders a professional esports HUD dynamically using `hud.html`.
+## Overview
+This project replaces unstable screen-capture OCR methods with official **Riot Tournament API** integration. It receives live match events via webhooks and dynamically renders clean esports overlays on OBS (Open Broadcaster Software).
 
-## Project Structure
-- `hud.html`: Frontend overlay UI for OBS.
-- `server.py`: Backend server handling webhook/websocket data communication.
+## Architecture
+1. **Backend (`server.py`)**: Built with FastAPI. Listens for incoming webhook events from Riot Tournament servers and broadcasts data via WebSockets.
+2. **Frontend (`hud.html`)**: A lightweight HTML/CSS browser source overlay optimized for OBS, featuring responsive typography and vector SVG icons.
+
+## Tech Stack
+- Python (FastAPI, Uvicorn, WebSockets)
+- HTML5 / CSS3 / JavaScript (OBS Browser Source)
+- Riot Games Tournament API (Webhook integration)
