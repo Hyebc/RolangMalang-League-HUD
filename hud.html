@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>RolangMalang League HUD</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .hud-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.9);
+            border: 2px solid #334155;
+            border-radius: 8px;
+            padding: 6px 18px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .main-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .team-side {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .obj-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .obj-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 13px;
+            font-weight: bold;
+            color: #cbd5e1;
+        }
+
+        .obj-icon {
+            width: 16px;
+            height: 16px;
+            fill: #94a3b8;
+        }
+
+        .gold {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .blue-gold { color: #38bdf8; }
+        .red-gold { color: #f87171; }
+
+        .center-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 10px;
+        }
+
+        .score {
+            font-size: 22px;
+            font-weight: 900;
+            padding: 2px 12px;
+            border-radius: 4px;
+            color: white;
+        }
+
+        .blue-score { background-color: #1d4ed8; }
+        .red-score { background-color: #b91c1c; }
+
+        .game-time {
+            font-size: 13px;
+            font-weight: bold;
+            color: #fbbf24;
+            letter-spacing: 1px;
+            margin-top: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hud-container">
+        <div class="main-row">
+            <!-- 블루팀 -->
+            <div class="team-side">
+                <div class="obj-group">
+                    <div class="obj-item">
+                        <svg class="obj-icon" viewBox="0 0 24 24"><path d="M12 2L2 7v7c0 5 4.5 9 10 10s10-4 10-7V7L12 2z"/></svg>
+                        <span id="blueTurrets">0</span>
+                    </div>
+                    <div class="obj-item">
+                        <svg class="obj-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+                        <span id="blueBarons">0</span>
+                    </div>
+                    <div class="obj-item">
+                        <svg class="obj-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5-5 5 5M12 15V5"/></svg>
+                        <span id="blueDragons">0</span>
+                    </div>
+                    <div class="obj-item">
+                        <svg class="obj-icon" viewBox="0 0 24 24"><polygon points="12 2 2 22 22 22"/></svg>
+                        <span id="blueHordes">0</span>
+                    </div>
+                </div>
+                <div class="gold blue-gold" id="blueGold">0.0k</div>
+            </div>
+
+            <!-- 중앙 스코어 -->
+            <div class="center-box">
+                <div class="score blue-score" id="blueKills">0</div>
+                <span style="color: #64748b; font-weight: bold;">VS</span>
+                <div class="score red-score" id="redKills">0</div>
+            </div>
+
+            <!-- 레드팀 -->
+            <div class="team-side">
+                <div class="gold red-gold" id="redGold">0.0k</div>
+                <div class="obj-group">
+                    <div class="obj-item">
+                        <svg class="obj-icon" viewBox="0 0 24 24"><path d="M12 2L2 7v7c0 5 4.5 9 10 10s10-4 10-7V7L12 2z"/></svg>
+                        <span id="redTurrets">0</span>
+                    </div>
+                    <div class="obj-item">
+                        <svg class="obj-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+                        <span id="redBarons">0</span>
+                    </div>
+                    <div class="obj-item">
+                        <svg class="obj-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5-5 5 5M12 15V5"/></svg>
+                        <span id="redDragons">0</span>
+                    </div>
+                    <div class="obj-item">
+                        <svg class="obj-icon" viewBox="0 0 24 24"><polygon points="12 2 2 22 22 22"/></svg>
+                        <span id="redHordes">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-time" id="gameTime">00:00</div>
+    </div>
+
+    <script>
+        const ws = new WebSocket('ws://localhost:8765/ws');
+
+        ws.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            
+            if (data.status === "active") {
+                document.getElementById('blueKills').innerText = data.blueKills;
+                document.getElementById('redKills').innerText = data.redKills;
+                document.getElementById('blueGold').innerText = data.blueGold;
+                document.getElementById('redGold').innerText = data.redGold;
+                document.getElementById('gameTime').innerText = data.gameTime;
+
+                document.getElementById('blueTurrets').innerText = data.blueTurrets;
+                document.getElementById('blueBarons').innerText = data.blueBarons;
+                document.getElementById('blueDragons').innerText = data.blueDragons;
+                document.getElementById('blueHordes').innerText = data.blueHordes;
+
+                document.getElementById('redTurrets').innerText = data.redTurrets;
+                document.getElementById('redBarons').innerText = data.redBarons;
+                document.getElementById('redDragons').innerText = data.redDragons;
+                document.getElementById('redHordes').innerText = data.redHordes;
+            }
+        };
+    </script>
+</body>
+</html>
